@@ -1,0 +1,28 @@
+apply plugin: 'com.android.application'
+
+// The origin the web/ directory is hosted at, e.g. ./gradlew assembleDebug -Porigin=https://example.github.io
+def origin = (project.findProperty('origin') ?: 'https://example.github.io').toString().replaceAll('/+$', '')
+def host = new URI(origin).host
+
+android {
+    namespace 'com.example.twalaunchhandler'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.example.twalaunchhandler'
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName '1.0'
+        manifestPlaceholders = [
+                host           : host,
+                defaultUrl     : origin + '/',
+                assetStatements: '[{"relation": ["delegate_permission/common.handle_all_urls"], ' +
+                        '"target": {"namespace": "web", "site": "' + origin + '"}}]',
+        ]
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'
+}

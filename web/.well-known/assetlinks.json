@@ -1,0 +1,8 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+        "namespace": "android_app",
+        "package_name": "com.example.twalaunchhandler",
+        "sha256_cert_fingerprints": ["FC:E4:A4:33:31:87:72:49:74:B2:6C:AE:02:43:D0:D7:5E:BE:67:72:B2:C4:0E:A8:42:8F:D6:78:EA:56:18:E7"]
+    }
+}]

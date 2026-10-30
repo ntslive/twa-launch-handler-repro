@@ -1,0 +1,12 @@
+{
+    "name": "TWA launch handler repro",
+    "short_name": "Repro",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "launch_handler": {
+        "client_mode": "focus-existing"
+    }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TWA launch handler repro</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        body { font: 16px/1.4 system-ui, sans-serif; margin: 16px; background: #fff; color: #111; }
+        h1 { font-size: 20px; }
+        dt { font-weight: bold; margin-top: 8px; }
+        dd { margin: 0; word-break: break-all; }
+        #launches li { margin-bottom: 8px; word-break: break-all; }
+        #uptime { font-size: 32px; font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body>
+    <h1>TWA launch handler repro</h1>
+    <dl>
+        <dt>Seconds since this document loaded</dt>
+        <dd id="uptime">0</dd>
+        <dt>Document loaded at</dt>
+        <dd id="loaded-at"></dd>
+        <dt>Document loads in this tab</dt>
+        <dd id="load-count"></dd>
+        <dt>Current URL</dt>
+        <dd id="current-url"></dd>
+        <dt>launchQueue supported</dt>
+        <dd id="supported"></dd>
+    </dl>
+    <h2>Launches received by window.launchQueue</h2>
+    <ol id="launches"></ol>
+
+    <script>
+        // Counts document loads in this tab, so a reload is visible even if it is quick.
+        let loadCount = 1;
+        try {
+            loadCount = Number(sessionStorage.getItem('loadCount') || 0) + 1;
+            sessionStorage.setItem('loadCount', String(loadCount));
+        } catch (e) {}
+
+        const loadedAt = new Date(performance.timeOrigin);
+        document.getElementById('loaded-at').textContent = loadedAt.toLocaleTimeString();
+        document.getElementById('load-count').textContent = loadCount;
+        document.getElementById('supported').textContent = 'launchQueue' in window;
+
+        setInterval(() => {
+            document.getElementById('uptime').textContent = Math.floor(performance.now() / 1000);
+            document.getElementById('current-url').textContent = location.href;
+        }, 250);
+
+        if ('launchQueue' in window) {
+            window.launchQueue.setConsumer(launchParams => {
+                const item = document.createElement('li');
+                item.textContent = `${new Date().toLocaleTimeString()}: ${launchParams.targetURL}`;
+                document.getElementById('launches').append(item);
+                console.log('launchQueue', launchParams.targetURL);
+            });
+        }
+    </script>
+</body>
+</html>
