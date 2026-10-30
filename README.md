@@ -1,8 +1,8 @@
 # TWA launch handler repro
 
-Minimal reproduction for: a running Trusted Web Activity launched with a **different URL** is
-navigated (the document reloads), even though both the app and the web manifest set
-`launch_handler` `client_mode` to `focus-existing`.
+Minimal reproduction for: a running Trusted Web Activity launched with a URL with a **different
+path** is navigated (the document reloads), even though both the app and the web manifest set
+`launch_handler` `client_mode` to `focus-existing`. A different query or fragment works as expected.
 
 - `web/` is a static page that shows how long its document has been alive, how many times the
   document has loaded in this tab, and every launch received by `window.launchQueue`.
@@ -12,8 +12,8 @@ navigated (the document reloads), even though both the app and the web manifest 
 ## Setup
 
 1. Host `web/` at the **root** of an HTTPS origin, so `/.well-known/assetlinks.json` is served.
-   `firebase.json` sets this up for Firebase Hosting, including serving the `.well-known`
-   directory, which Firebase ignores by default:
+   The page must be served at any path. `firebase.json` sets this up for Firebase Hosting,
+   including serving the `.well-known` directory, which Firebase ignores by default:
 
    ```
    firebase deploy --only hosting --project <project id>
@@ -54,8 +54,9 @@ launch() {
 
 1. Open the app from the launcher. Wait a few seconds so the uptime counter is clearly non-zero.
 2. `launch 'ORIGIN/'` - the URL the app was launched with.
-3. `launch 'ORIGIN/#foo'` - the same URL with a fragment.
-4. `launch 'ORIGIN/?page=2'` - a different URL.
+3. `launch 'ORIGIN/#foo'` - a different fragment.
+4. `launch 'ORIGIN/?page=2'` - a different query.
+5. `launch 'ORIGIN/page/2'` - a different path.
 
 After each step, note whether "Seconds since this document loaded" kept counting and
 "Document loads in this tab" stayed the same (no reload), and what was added to the launches list.
@@ -65,10 +66,8 @@ After each step, note whether "Seconds since this document loaded" kept counting
 With `focus-existing`, every step focuses the existing document without navigating it, and appends
 the launched URL to the launches list.
 
-## Observed (Chrome 156.0.8078.73, in the production app this was found in)
+## Observed (Chrome 156.0.8078.75, Android 15 emulator)
 
-- Steps 2 and 3: as expected. No reload, and the URL (including the fragment) is delivered to
-  `launchQueue`.
-- Step 4: the existing document is navigated to the new URL. The uptime counter resets, the load
-  count goes up, and the launches list only contains the new URL, as the new document's initial
-  launch.
+- Steps 2, 3 and 4: as expected. No reload, and the launched URL is delivered to `launchQueue`.
+- Step 5: the existing document is navigated to the new URL. The uptime counter resets and the load
+  count goes up.
