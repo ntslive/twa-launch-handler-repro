@@ -19,6 +19,9 @@ navigated (the document reloads), even though both the app and the web manifest 
    firebase deploy --only hosting --project <project id>
    ```
 
+   It deploys to the hosting site named in `firebase.json`; change `site` to one in your project.
+   The hosted copy is at https://twa-launch-handler-repro.web.app.
+
    Any other static host works too, e.g. a GitHub Pages user site `https://<user>.github.io`.
 2. Put the signing certificate's SHA-256 fingerprint in `web/.well-known/assetlinks.json`, replacing
    the one there. For a debug build:

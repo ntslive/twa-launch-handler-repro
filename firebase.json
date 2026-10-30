@@ -1,5 +1,6 @@
 {
     "hosting": {
+        "site": "twa-launch-handler-repro",
         "public": "web",
         "ignore": ["**/node_modules/**"],
         "headers": [
