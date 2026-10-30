@@ -39,6 +39,8 @@ The same launch with only the query or fragment changed works as expected. There
 | `/?page=2` | Focused, delivered to `launchQueue` |
 | `/page/2` | **Existing document navigated (reloads)** |
 
+Chrome seems to navigate only when the launched URL's path differs from both the path the TWA was launched with and the current document's path. After the page changed its URL to `/page/3` with `history.pushState` (no navigation), launching `/?page=9` (the launch path) and then `/page/3?x=1` (the document's path) were both focused and delivered to `launchQueue`.
+
 We first saw this in our production app, on a phone with Chrome 156.0.8078.73. logcat there shows Chrome delivering the intent to the existing `CustomTabActivity` (the same activity record before and after), then loading the URL:
 
 ```
@@ -54,6 +56,6 @@ We use a TWA for a radio streaming app. Opening a push notification or link to a
 
 ## Environment
 
-- Chrome 156.0.8078.75 (Stable) on an Android 15 emulator (Pixel 9, API 35), and Chrome 156.0.8078.73 on `<phone model>`, Android `<version>`
+- Chrome 156.0.8078.75 (Stable) on an Android 15 emulator (Pixel 9, API 35), and Chrome 156.0.8078.73 on Pixel 5, Android 14
 - androidbrowserhelper 2.6.2, androidx.browser 1.9.0-alpha04
 - No relevant chrome://flags found ("launch handler" has no matching experiments)
