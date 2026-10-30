@@ -4,6 +4,8 @@ Minimal reproduction for: a running Trusted Web Activity launched with a URL wit
 path** is navigated (the document reloads), even though both the app and the web manifest set
 `launch_handler` `client_mode` to `focus-existing`. A different query or fragment works as expected.
 
+Chromium issue: https://issues.chromium.org/issues/579632124
+
 - `web/` is a static page that shows how long its document has been alive, how many times the
   document has loaded in this tab, and every launch received by `window.launchQueue`.
 - `android/` is a TWA using androidbrowserhelper's stock `LauncherActivity`, no custom code, with
