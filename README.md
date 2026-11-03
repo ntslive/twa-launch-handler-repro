@@ -1,8 +1,10 @@
 # TWA launch handler repro
 
-Minimal reproduction for: a running Trusted Web Activity launched with a URL with a **different
-path** is navigated (the document reloads), even though both the app and the web manifest set
-`launch_handler` `client_mode` to `focus-existing`. A different query or fragment works as expected.
+Minimal reproduction for: a running Trusted Web Activity launched with a URL whose **directory
+doesn't contain the current page** is navigated (the document reloads), even though both the app
+and the web manifest set `launch_handler` `client_mode` to `focus-existing`, and the manifest's
+scope is `/`. It looks like Chrome checks the current page against a scope derived from the
+launched URL rather than the web manifest's scope.
 
 Chromium issue: https://issues.chromium.org/issues/579632124
 
@@ -58,7 +60,8 @@ launch() {
 2. `launch 'ORIGIN/'` - the URL the app was launched with.
 3. `launch 'ORIGIN/#foo'` - a different fragment.
 4. `launch 'ORIGIN/?page=2'` - a different query.
-5. `launch 'ORIGIN/page/2'` - a different path.
+5. `launch 'ORIGIN/page2'` - a different path, in the same directory (`/`).
+6. `launch 'ORIGIN/page/2'` - a different path, in a different directory (`/page/`).
 
 After each step, note whether "Seconds since this document loaded" kept counting and
 "Document loads in this tab" stayed the same (no reload), and what was added to the launches list.
@@ -70,6 +73,10 @@ the launched URL to the launches list.
 
 ## Observed (Chrome 156.0.8078.75, Android 15 emulator)
 
-- Steps 2, 3 and 4: as expected. No reload, and the launched URL is delivered to `launchQueue`.
-- Step 5: the existing document is navigated to the new URL. The uptime counter resets and the load
+- Steps 2 to 5: as expected. No reload, and the launched URL is delivered to `launchQueue`.
+- Step 6: the existing document is navigated to the new URL. The uptime counter resets and the load
   count goes up.
+
+The page's URL can also be changed with `history.pushState` (no navigation) before launching. The
+result matches the scope explanation: with the page at `/page/3`, launching `/?page=9` (directory
+`/`) and `/page/3?x=1` (directory `/page/`) are both focused.
